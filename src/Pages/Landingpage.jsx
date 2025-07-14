@@ -1,3 +1,4 @@
+import FeaturedEvents from "../Components/FeaturedEvents";
 import Features from "../Components/Features";
 import Footer from "../Components/Footer";
 import Hero from "../Components/Hero";
@@ -8,6 +9,7 @@ const Landingpage = () => {
   return (
     <div>
       <Hero />
+      <FeaturedEvents />
       <Features />
       <HowItWorks />
       <Newsletter />
