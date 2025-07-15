@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FaSearch, FaCalendarAlt } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
 import { RiMenu4Fill } from "react-icons/ri";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // import { FaLocationDot } from "react-icons/fa6";
 
 const Header = () => {
@@ -14,7 +14,7 @@ const Header = () => {
   };
 
   const handleViewEventsClick = () => {
-    navigate("#");
+    navigate("/events");
   };
 
   const handleAddEventClick = () => {
@@ -28,34 +28,25 @@ const Header = () => {
       <div className="absolute z-20 top-0 left-0 w-full">
         <nav className="flex justify-between items-center p-6 xl:px-20 bg-gradient-to-b from-black/30 to-transparent backdrop-blur-sm">
           <h1 className="text-3xl font-bold text-white bg-gradient-to-r from-white to-blue-200 bg-clip-text">
-            <a href="/">TicketsGig</a>
+            <Link to="/">TicketsGig</Link>
           </h1>
 
           {/* Desktop Navigation */}
           <ul className="hidden lg:flex space-x-8 text-white/90">
             <li>
-              <a
-                href="#"
-                className="text-lg font-medium"
-              >
-                Home
-              </a>
+              <Link to="/" className="text-lg font-medium">
+                home
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
-                className="text-lg font-medium"
-              >
-                About
-              </a>
+              <Link to="/about-us" className="text-lg font-medium">
+                about us
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
-                className="text-lg font-medium"
-              >
-                Contact
-              </a>
+              <Link to="#how-it-works" className="text-lg font-medium">
+                how it works
+              </Link>
             </li>
           </ul>
 
@@ -74,36 +65,36 @@ const Header = () => {
 
           {/* Mobile Navigation */}
           <div
-            className={`absolute top-full left-0 w-full lg:hidden transition-all duration-300 ${
+            className={`absolute top-full left-0 w-full lg:hidden transition-all duration-500 ${
               isOpen
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 -translate-y-4 pointer-events-none"
+                ? "opacity-100 -translate-x-0"
+                : "opacity-0 translate-x-4 pointer-events-none"
             }`}
           >
             <ul className="bg-black/90 backdrop-blur-md border-t border-white/10 p-6 space-y-4">
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/"
                   className="block text-white/90 hover:text-white transition-colors duration-200 font-medium py-2"
                 >
-                  Home
-                </a>
+                  home
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/about-us"
                   className="block text-white/90 hover:text-white transition-colors duration-200 font-medium py-2"
                 >
-                  About
-                </a>
+                  about us
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="#how-it-works"
                   className="block text-white/90 hover:text-white transition-colors duration-200 font-medium py-2"
                 >
-                  Contact
-                </a>
+                  how it works
+                </Link>
               </li>
             </ul>
           </div>

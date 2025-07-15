@@ -1,9 +1,10 @@
 import {
   FaFacebook,
   FaInstagram,
+  FaWhatsapp,
   FaXTwitter,
-  FaYoutube,
 } from "react-icons/fa6";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -35,7 +36,7 @@ const Footer = () => {
               <FaFacebook className="h-6 w-6 text-blue-100 hover:text-white cursor-pointer transition-colors duration-300" />
               <FaXTwitter className="h-6 w-6 text-blue-100 hover:text-white cursor-pointer transition-colors duration-300" />
               <FaInstagram className="h-6 w-6 text-blue-100 hover:text-white cursor-pointer transition-colors duration-300" />
-              <FaYoutube className="h-6 w-6 text-blue-100 hover:text-white cursor-pointer transition-colors duration-300" />
+              <FaWhatsapp className="h-6 w-6 text-blue-100 hover:text-white cursor-pointer transition-colors duration-300" />
             </div>
           </div>
 
@@ -44,36 +45,36 @@ const Footer = () => {
             <h4 className="text-lg font-semibold mb-4 text-white">Events</h4>
             <ul className="space-y-3 text-blue-100">
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/events"
                   className="hover:text-white transition-colors duration-300 block"
                 >
                   Browse Events
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="#"
                   className="hover:text-white transition-colors duration-300 block"
                 >
                   Categories
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/events/#popular"
                   className="hover:text-white transition-colors duration-300 block"
                 >
                   Popular Events
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/events/#free"
                   className="hover:text-white transition-colors duration-300 block"
                 >
                   Free Events
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -141,9 +142,9 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-blue-300/20 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-blue-100 text-sm mb-4 md:mb-0">
-            © {new Date().getFullYear()} TicketsGig. All rights reserved.
+            © {new Date().getFullYear()} Tipotek. All rights reserved.
           </p>
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+          {/* <div className="flex flex-wrap justify-center gap-4 md:gap-6">
             <a
               href="#"
               className="text-blue-100 hover:text-white text-sm transition-colors duration-300"
@@ -168,7 +169,7 @@ const Footer = () => {
             >
               Sitemap
             </a>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>

@@ -3,6 +3,7 @@ import { CiLock } from "react-icons/ci";
 import { FaPhoneAlt, FaUser } from "react-icons/fa";
 import { IoIosMail } from "react-icons/io";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import { Link } from "react-router-dom";
 
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,7 +35,7 @@ const SignUpForm = () => {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
         {/* Header Section */}
         <div className="bg-gradient-to-r from-purple-600 to-blue-500 p-6 text-center">
-          <h1 className="text-3xl font-bold text-white mb-2"><a href="/">TicketsGig</a></h1>
+          <h1 className="text-3xl font-bold text-white mb-2"><Link to="/">TicketsGig</Link></h1>
           <h2 className="text-2xl font-semibold text-white">Create Account</h2>
           <p className="text-blue-100 mt-1">Join us to create amazing events</p>
         </div>
@@ -200,9 +201,9 @@ const SignUpForm = () => {
 
             <div className="text-center text-sm text-gray-600">
               Already have an account?{' '}
-              <a href="/signin" className="font-medium text-purple-600 hover:text-purple-500">
+              <Link to="/signin" className="font-medium text-purple-600 hover:text-purple-500">
                 Sign in
-              </a>
+              </Link>
             </div>
           </form>
         </div>

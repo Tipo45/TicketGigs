@@ -2,6 +2,7 @@ import { useState } from "react";
 import { IoIosMail } from "react-icons/io";
 import { CiLock } from "react-icons/ci";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -10,6 +11,7 @@ const SignInForm = () => {
     password: "",
     rememberMe: false
   });
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
@@ -24,6 +26,7 @@ const SignInForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Sign in:", formData);
+    navigate("/account/dashboard");
   };
 
   return (
@@ -31,7 +34,7 @@ const SignInForm = () => {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
         {/* Header Section */}
         <div className="bg-gradient-to-r from-purple-600 to-blue-500 p-6 text-center">
-          <h1 className="text-3xl font-bold text-white mb-2"><a href="/">TicketsGig</a></h1>
+          <h1 className="text-3xl font-bold text-white mb-2"><Link to="/">TicketsGig</Link></h1>
           <h2 className="text-2xl font-semibold text-white">Welcome Back</h2>
           <p className="text-blue-100 mt-1">Sign in to your account to continue</p>
         </div>
@@ -95,12 +98,7 @@ const SignInForm = () => {
                 />
                 <span className="text-sm text-gray-700">Remember me</span>
               </label> */}
-              <a
-                href="#"
-                className="text-sm font-medium text-purple-600 hover:text-purple-500"
-              >
-                Forgot password?
-              </a>
+              <Link to="/forgot-password" className="text-sm font-medium text-purple-600 hover:text-purple-500">Forgot password?</Link>
             </div>
 
             <button
@@ -112,9 +110,9 @@ const SignInForm = () => {
 
             <div className="text-center text-sm text-gray-600">
               Don't have an account?{' '}
-              <a href="/signup" className="font-medium text-purple-600 hover:text-purple-500">
+              <Link to="/signup" className="font-medium text-purple-600 hover:text-purple-500">
                 Sign up
-              </a>
+              </Link>
             </div>
           </form>
         </div>
