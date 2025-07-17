@@ -1,33 +1,38 @@
-import { useState } from "react";
-import { FaCalendarAlt, FaFileAlt } from "react-icons/fa";
+import { useState, useRef } from "react";
+import {
+  FaArrowRight,
+  FaCalendarAlt,
+  FaFileAlt,
+  FaSpinner,
+  FaTimes,
+} from "react-icons/fa";
 import { FaLocationDot, FaPlus, FaUsers } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
+import { createEvent } from "../BE/pocketbase";
+import { toast } from "sonner";
 
 const CreateEvent = () => {
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [imagePreview, setImagePreview] = useState(null);
+  const fileInputRef = useRef(null);
+
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
+    eventTitle: "",
+    eventDescription: "",
     category: "",
-    date: "",
-    time: "",
-    location: "",
-    venue: "",
-    capacity: "",
-    ticketTypes: [
-      {
-        name: "",
-        price: "",
-        quantity: "",
-        earlyBirdPrice: "",
-        earlyBirdDeadline: "",
-        description: "",
-      },
-    ],
-    image: "",
-    organizer: "",
+    tags: "",
+    eventDate: "",
+    eventTime: "",
+    venueName: "",
+    fullAddress: "",
+    organizerName: "",
     contactEmail: "",
     contactPhone: "",
-    tags: "",
+    image: null,
   });
+
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -35,12 +40,119 @@ const CreateEvent = () => {
       ...prev,
       [name]: value,
     }));
+    // Clear error when user types
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate image file
+      if (!file.type.match("image.*")) {
+        setErrors((prev) => ({
+          ...prev,
+          image: "Please select a valid image file",
+        }));
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB limit
+        setErrors((prev) => ({
+          ...prev,
+          image: "Image size should be less than 5MB",
+        }));
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+
+      setFormData((prev) => ({ ...prev, image: file }));
+      setErrors((prev) => ({ ...prev, image: null }));
+    }
+  };
+
+  const removeImage = () => {
+    setImagePreview(null);
+    setFormData((prev) => ({ ...prev, image: null }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    const requiredFields = [
+      "eventTitle",
+      "eventDescription",
+      "category",
+      "eventDate",
+      "eventTime",
+      "fullAddress",
+      "venueName",
+      "organizerName",
+      "contactEmail",
+    ];
+
+    requiredFields.forEach((field) => {
+      if (!formData[field]) {
+        newErrors[field] = "This field is required";
+      }
+    });
+
+    if (
+      formData.contactEmail &&
+      !/^\S+@\S+\.\S+$/.test(formData.contactEmail)
+    ) {
+      newErrors.contactEmail = "Please enter a valid email address";
+    }
+
+    if (formData.eventDate) {
+      const selectedDate = new Date(formData.eventDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selectedDate < today) {
+        newErrors.eventDate = "Event date cannot be in the past";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = async (e) => {
     e.preventDefault();
-    console.log("Event data:", formData);
-    // Handle form submission here
+
+    if (!validateForm()) {
+      toast.error("Please fix the errors in the form");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const formDataToSend = new FormData();
+      Object.keys(formData).forEach((key) => {
+        if (formData[key] !== null && formData[key] !== "") {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+
+      const result = await createEvent(formDataToSend);
+      if (result) {
+        toast.success("Event created successfully!");
+        navigate(`/create-event/tickets/${result.id}`);
+      }
+    } catch (error) {
+      console.error("Error creating event:", error);
+      toast.error("Failed to create event. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const categories = [
@@ -57,45 +169,6 @@ const CreateEvent = () => {
     "Other",
   ];
 
-  const addTicketType = () => {
-    setFormData((prev) => ({
-      ...prev,
-      ticketTypes: [
-        ...prev.ticketTypes,
-        {
-          name: "",
-          price: "",
-          quantity: "",
-          earlyBirdPrice: "",
-          earlyBirdDeadline: "",
-          description: "",
-        },
-      ],
-    }));
-  };
-
-  const removeTicketType = (index) => {
-    if (formData.ticketTypes.length <= 1) return;
-    setFormData((prev) => ({
-      ...prev,
-      ticketTypes: prev.ticketTypes.filter((_, i) => i !== index),
-    }));
-  };
-
-  const updateTicketType = (index, field, value) => {
-    setFormData((prev) => {
-      const updatedTicketTypes = [...prev.ticketTypes];
-      updatedTicketTypes[index] = {
-        ...updatedTicketTypes[index],
-        [field]: value,
-      };
-      return {
-        ...prev,
-        ticketTypes: updatedTicketTypes,
-      };
-    });
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-12">
       <div className="max-w-4xl mx-auto px-4">
@@ -109,7 +182,7 @@ const CreateEvent = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleNext} className="space-y-8">
           {/* Basic Information */}
           <div className="bg-white rounded-xl shadow-md p-6">
             <div className="mb-6">
@@ -122,39 +195,102 @@ const CreateEvent = () => {
             <div className="space-y-6">
               <div>
                 <label
-                  htmlFor="title"
+                  htmlFor="eventTitle"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   Event Title <span className="text-red-500">*</span>
                 </label>
                 <input
-                  id="title"
-                  name="title"
-                  value={formData.title}
+                  id="eventTitle"
+                  name="eventTitle"
+                  value={formData.eventTitle}
                   onChange={handleInputChange}
                   placeholder="Enter your event title"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  required
+                  className={`w-full px-4 py-2 border ${
+                    errors.eventTitle ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
                 />
+                {errors.eventTitle && (
+                  <p className="mt-1 text-sm text-red-600">{errors.eventTitle}</p>
+                )}
               </div>
 
               <div>
                 <label
-                  htmlFor="description"
+                  htmlFor="eventDescription"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   Event Description <span className="text-red-500">*</span>
                 </label>
                 <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
+                  id="eventDescription"
+                  name="eventDescription"
+                  value={formData.eventDescription}
                   onChange={handleInputChange}
                   placeholder="Describe your event in detail..."
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  required
+                  className={`w-full px-4 py-2 border ${
+                    errors.eventDescription ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
                 />
+                {errors.eventDescription && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.eventDescription}
+                  </p>
+                )}
+              </div>
+
+              {/* Image Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Event Image <span className="text-red-500">*</span>
+                </label>
+                <div className="mt-1 flex items-center gap-4">
+                  {imagePreview ? (
+                    <div className="relative">
+                      <img
+                        src={imagePreview}
+                        alt="Event preview"
+                        className="h-32 w-32 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      >
+                        <FaTimes className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-32 w-32 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                      <FaPlus className="h-8 w-8 text-gray-400" />
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImageChange}
+                      accept="image/*"
+                      className="hidden"
+                      id="image-upload"
+                    />
+                    <label
+                      htmlFor="image-upload"
+                      className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                      Choose Image
+                    </label>
+                    <p className="mt-1 text-xs text-gray-500">
+                      JPEG, PNG (Max 5MB)
+                    </p>
+                    {errors.image && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.image}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -170,8 +306,9 @@ const CreateEvent = () => {
                     name="category"
                     value={formData.category}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    required
+                    className={`w-full px-4 py-2 border ${
+                      errors.category ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
                   >
                     <option value="">Select a category</option>
                     {categories.map((category) => (
@@ -180,6 +317,11 @@ const CreateEvent = () => {
                       </option>
                     ))}
                   </select>
+                  {errors.category && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.category}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -215,38 +357,47 @@ const CreateEvent = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
                   <label
-                    htmlFor="date"
+                    htmlFor="eventDate"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Event Date <span className="text-red-500">*</span>
                   </label>
                   <input
-                    id="date"
-                    name="date"
+                    id="eventDate"
+                    name="eventDate"
                     type="date"
-                    value={formData.date}
+                    value={formData.eventDate}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    required
+                    min={new Date().toISOString().split("T")[0]}
+                    className={`w-full px-4 py-2 border ${
+                      errors.eventDate ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
                   />
+                  {errors.eventDate && (
+                    <p className="mt-1 text-sm text-red-600">{errors.eventDate}</p>
+                  )}
                 </div>
 
                 <div>
                   <label
-                    htmlFor="time"
+                    htmlFor="eventTime"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Event Time <span className="text-red-500">*</span>
                   </label>
                   <input
-                    id="time"
-                    name="time"
+                    id="eventTime"
+                    name="eventTime"
                     type="time"
-                    value={formData.time}
+                    value={formData.eventTime}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    required
+                    className={`w-full px-4 py-2 border ${
+                      errors.eventTime ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
                   />
+                  {errors.eventTime && (
+                    <p className="mt-1 text-sm text-red-600">{errors.eventTime}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -264,297 +415,46 @@ const CreateEvent = () => {
             <div className="space-y-6">
               <div>
                 <label
-                  htmlFor="venue"
+                  htmlFor="venueName"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   Venue Name <span className="text-red-500">*</span>
                 </label>
                 <input
-                  id="venue"
-                  name="venue"
-                  value={formData.venue}
+                  id="venueName"
+                  name="venueName"
+                  value={formData.venueName}
                   onChange={handleInputChange}
                   placeholder="Enter venue name"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  required
+                  className={`w-full px-4 py-2 border ${
+                    errors.venueName ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
                 />
+                {errors.venueName && (
+                  <p className="mt-1 text-sm text-red-600">{errors.venueName}</p>
+                )}
               </div>
 
               <div>
                 <label
-                  htmlFor="location"
+                  htmlFor="fullAddress"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   Full Address <span className="text-red-500">*</span>
                 </label>
                 <input
-                  id="location"
-                  name="location"
-                  value={formData.location}
+                  id="fullAddress"
+                  name="fullAddress"
+                  value={formData.fullAddress}
                   onChange={handleInputChange}
                   placeholder="Street address, City, State, ZIP"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  required
+                  className={`w-full px-4 py-2 border ${
+                    errors.fullAddress ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
                 />
-              </div>
-            </div>
-          </div>
-
-          {/* Capacity & Pricing */}
-          {/* <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="mb-6">
-              <div className="flex items-center gap-2 text-lg font-semibold text-purple-700">
-                <FaUsers className="h-5 w-5" />
-                Capacity & Pricing
-              </div>
-              <div className="mt-1 h-1 w-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
-            </div>
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div>
-                  <label
-                    htmlFor="capacity"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Max Capacity <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="capacity"
-                    name="capacity"
-                    type="number"
-                    value={formData.capacity}
-                    onChange={handleInputChange}
-                    placeholder="100"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="price"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Ticket Price (₦) <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="price"
-                    name="price"
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={handleInputChange}
-                    placeholder="25.00"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="earlyBirdPrice"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Early Bird Price (₦)
-                  </label>
-                  <input
-                    id="earlyBirdPrice"
-                    name="earlyBirdPrice"
-                    type="number"
-                    step="0.01"
-                    value={formData.earlyBirdPrice}
-                    onChange={handleInputChange}
-                    placeholder="20.00"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              {formData.earlyBirdPrice && (
-                <div>
-                  <label
-                    htmlFor="earlyBirdDeadline"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Early Bird Deadline
-                  </label>
-                  <input
-                    id="earlyBirdDeadline"
-                    name="earlyBirdDeadline"
-                    type="date"
-                    value={formData.earlyBirdDeadline}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-              )}
-            </div>
-          </div> */}
-
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="mb-6">
-              <div className="flex items-center gap-2 text-lg font-semibold text-purple-700">
-                <FaUsers className="h-5 w-5" />
-                Capacity & Pricing
-              </div>
-              <div className="mt-1 h-1 w-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
-            </div>
-
-            <div className="space-y-6">
-              {/* Ticket Types Section */}
-              <div>
-                <h3 className="text-md font-medium text-gray-700 mb-3">
-                  Ticket Types
-                </h3>
-
-                {formData.ticketTypes?.map((ticketType, index) => (
-                  <div
-                    key={index}
-                    className="mb-6 p-4 border border-gray-200 rounded-lg"
-                  >
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-purple-700">
-                        Ticket Type #{index + 1}
-                      </h4>
-                      <button
-                        type="button"
-                        onClick={() => removeTicketType(index)}
-                        className="text-red-500 hover:text-red-700 text-sm"
-                      >
-                        Remove
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          value={ticketType.name}
-                          onChange={(e) =>
-                            updateTicketType(index, "name", e.target.value)
-                          }
-                          placeholder="e.g. VIP, Standard"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Price (₦) <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={ticketType.price}
-                          onChange={(e) =>
-                            updateTicketType(index, "price", e.target.value)
-                          }
-                          placeholder="5000.00"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Quantity <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="number"
-                          value={ticketType.quantity}
-                          onChange={(e) =>
-                            updateTicketType(index, "quantity", e.target.value)
-                          }
-                          placeholder="100"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Early Bird Price (₦)
-                        </label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={ticketType.earlyBirdPrice || ""}
-                          onChange={(e) =>
-                            updateTicketType(
-                              index,
-                              "earlyBirdPrice",
-                              e.target.value
-                            )
-                          }
-                          placeholder="4000.00"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        />
-                      </div>
-                    </div>
-
-                    {ticketType.earlyBirdPrice && (
-                      <div className="mt-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Early Bird Deadline
-                        </label>
-                        <input
-                          type="date"
-                          value={ticketType.earlyBirdDeadline || ""}
-                          onChange={(e) =>
-                            updateTicketType(
-                              index,
-                              "earlyBirdDeadline",
-                              e.target.value
-                            )
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        />
-                      </div>
-                    )}
-
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Description
-                      </label>
-                      <textarea
-                        value={ticketType.description || ""}
-                        onChange={(e) =>
-                          updateTicketType(index, "description", e.target.value)
-                        }
-                        placeholder="What's included in this ticket?"
-                        rows={2}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      />
-                    </div>
-                  </div>
-                ))}
-
-                <button
-                  type="button"
-                  onClick={addTicketType}
-                  className="mt-2 flex items-center gap-2 text-purple-600 hover:text-purple-800 text-sm font-medium"
-                >
-                  <FaPlus className="h-4 w-4" />
-                  Add Another Ticket Type
-                </button>
-              </div>
-
-              {/* Total Capacity (auto-calculated) */}
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium text-purple-700">
-                    Total Event Capacity:
-                  </span>
-                  <span className="font-bold">
-                    {formData.ticketTypes?.reduce(
-                      (sum, type) => sum + parseInt(type.quantity || 0),
-                      0
-                    )}
-                  </span>
-                </div>
+                {errors.fullAddress && (
+                  <p className="mt-1 text-sm text-red-600">{errors.fullAddress}</p>
+                )}
               </div>
             </div>
           </div>
@@ -571,20 +471,26 @@ const CreateEvent = () => {
             <div className="space-y-6">
               <div>
                 <label
-                  htmlFor="organizer"
+                  htmlFor="organizerName"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   Organizer Name <span className="text-red-500">*</span>
                 </label>
                 <input
-                  id="organizer"
-                  name="organizer"
-                  value={formData.organizer}
+                  id="organizerName"
+                  name="organizerName"
+                  value={formData.organizerName}
                   onChange={handleInputChange}
                   placeholder="Your name or organization"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  required
+                  className={`w-full px-4 py-2 border ${
+                    errors.organizerName ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
                 />
+                {errors.organizerName && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.organizerName}
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -602,9 +508,15 @@ const CreateEvent = () => {
                     value={formData.contactEmail}
                     onChange={handleInputChange}
                     placeholder="contact@example.com"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    required
+                    className={`w-full px-4 py-2 border ${
+                      errors.contactEmail ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
                   />
+                  {errors.contactEmail && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.contactEmail}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -621,8 +533,15 @@ const CreateEvent = () => {
                     value={formData.contactPhone}
                     onChange={handleInputChange}
                     placeholder="+1 (555) 123-4567"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className={`w-full px-4 py-2 border ${
+                      errors.contactPhone ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
                   />
+                  {errors.contactPhone && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.contactPhone}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -630,18 +549,23 @@ const CreateEvent = () => {
 
           {/* Submit Buttons */}
           <div className="flex flex-col lg:flex-row gap-4 justify-center pt-8">
-            <button
-              type="button"
-              className="px-8 py-3 cursor-pointer bg-white text-purple-700 border border-purple-700 hover:bg-purple-50 rounded-lg font-medium transition-colors duration-200"
-            >
-              Save as Draft
-            </button>
-            <button
-              type="submit"
-              className="px-8 py-3 cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 rounded-lg font-medium transition-colors duration-200"
-            >
-              Publish Event
-            </button>
+            {loading ? (
+              <button
+                type="button"
+                disabled
+                className="flex items-center justify-center px-8 py-3 cursor-not-allowed bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-medium transition-colors duration-200"
+              >
+                <FaSpinner className="animate-spin mr-2" />
+                Processing...
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="flex items-center justify-center px-8 py-3 cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 rounded-lg font-medium transition-colors duration-200"
+              >
+                Next <FaArrowRight className="ml-2" />
+              </button>
+            )}
           </div>
         </form>
       </div>

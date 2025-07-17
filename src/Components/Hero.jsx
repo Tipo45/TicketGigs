@@ -3,6 +3,7 @@ import { FaSearch, FaCalendarAlt } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
 import { RiMenu4Fill } from "react-icons/ri";
 import { Link, useNavigate } from "react-router-dom";
+import { isUserLoggedIn } from "../BE/pocketbase";
 // import { FaLocationDot } from "react-icons/fa6";
 
 const Header = () => {
@@ -18,7 +19,13 @@ const Header = () => {
   };
 
   const handleAddEventClick = () => {
-    navigate("/signin");
+    const isAuthenticated = isUserLoggedIn();
+
+    if (isAuthenticated) {
+      navigate("/account/dashboard");
+    } else {
+      navigate("/signin", { state: { from: "/create-event", message: "pleease sign in" } });
+    }
   };
 
   return (
@@ -26,7 +33,7 @@ const Header = () => {
       {/* Background Overlay */}
       <div className="absolute inset-0 bg-black/30"></div>
       <div className="absolute z-20 top-0 left-0 w-full">
-        <nav className="flex justify-between items-center p-6 xl:px-20 bg-gradient-to-b from-black/30 to-transparent backdrop-blur-sm">
+        <nav className="flex justify-between items-center p-6 xl:px-20 bg-gradient-to-b from-black/30 to-transparent backdrop-blur-xs">
           <h1 className="text-3xl font-bold text-white bg-gradient-to-r from-white to-blue-200 bg-clip-text">
             <Link to="/">TicketsGig</Link>
           </h1>
