@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { loginHost } from "../BE/pocketbase";
+import { loginHost } from "../backend/pocketbase";
 import { Eye, EyeOff, LoaderCircle, LockKeyhole, Mail } from "lucide-react";
 
 const SignInForm = () => {

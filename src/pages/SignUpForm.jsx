@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { createHost } from "../BE/pocketbase";
+import { createHost } from "../backend/pocketbase";
 import { Eye, EyeOff, LockKeyhole, Mail, Phone, User } from "lucide-react";
 
 

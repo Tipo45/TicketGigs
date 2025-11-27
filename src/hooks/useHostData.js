@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { hostInfo, pb } from "../BE/pocketbase";
+import { hostInfo, pb } from "../backend/pocketbase";
 
 export function useHostData() {
     const id = pb.authStore.record.id;

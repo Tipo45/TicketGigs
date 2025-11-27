@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { isUserLoggedIn } from "../BE/pocketbase";
+// import { isUserLoggedIn } from "../BE/pocketbase";
 import FeaturedEvents from "../components/FeaturedEvents";
 import Features from "../components/Features";
 import HowItWorks from "../components/HowItWorks";
@@ -7,6 +7,7 @@ import Newsletter from "../components/Newsletter";
 import Footer from "../components/Footer";
 import { CircleUser } from "lucide-react";
 import Header from "../components/Hero";
+import { isUserLoggedIn } from "../backend/pocketbase";
 
 
 

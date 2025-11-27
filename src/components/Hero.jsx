@@ -1,7 +1,7 @@
 import { Menu, Search, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { isUserLoggedIn } from "../BE/pocketbase";
+import { isUserLoggedIn } from "../backend/pocketbase";
 
 
 const Header = () => {

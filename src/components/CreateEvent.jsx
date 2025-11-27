@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createEvent } from "../BE/pocketbase";
+import { createEvent } from "../backend/pocketbase";
 import { toast } from "sonner";
 import { ArrowRight, CalendarDays, FileText, LoaderCircle, MapPin, Plus, User, X } from "lucide-react";
 

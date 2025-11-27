@@ -6,7 +6,7 @@ import { useHostData } from "../hooks/useHostData";
 import { useTicket } from "../hooks/useTicketData";
 import { useEvent } from "../hooks/UseEventData";
 import { Button } from "../components/ui/button";
-import { deleteAccount, logout } from "../BE/pocketbase";
+import { deleteAccount, logout } from "../backend/pocketbase";
 import {
   Calendar,
   Edit3,
@@ -337,7 +337,7 @@ const Account = () => {
                                           className="cursor-pointer"
                                           onClick={(e) => {e.stopPropagation();}}
                                         >
-                                            
+
                                           <Trash2 className="h-4 w-4 mr-2" />
                                           Delete
                                         </Button>

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getSingleTicket, ticket_info, updateTicketSales } from "../BE/pocketbase";
+import { getSingleTicket, ticket_info, updateTicketSales } from "../backend/pocketbase";
 
 export function useListEvent() {
     

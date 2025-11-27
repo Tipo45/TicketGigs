@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { event_info, getSingleEvent } from "../BE/pocketbase";
+import { event_info, getSingleEvent } from "../backend/pocketbase";
 
 export function useListEvent() {
     
