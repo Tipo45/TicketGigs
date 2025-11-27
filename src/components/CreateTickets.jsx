@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { addTicketType, pb } from "../backend/pocketbase";
+import { LoaderCircle, Plus, User } from "lucide-react";
 
 const CreateTickets = () => {
   const [loading, setLoading] = useState(false);
@@ -71,29 +72,6 @@ const CreateTickets = () => {
     0
   );
 
-  // const handlePublish = async (e) => {
-  //   e.preventDefault()
-  //   setLoading(true);
-
-  //   try {
-  //     // const result = await addTicketTypes(
-  //     //   formData.ticketTypes[0].ticketName,
-  //     //   formData.ticketTypes[0].ticketPrice,
-  //     //   formData.ticketTypes[0].ticketQuantity,
-  //     //   formData.ticketTypes[0].earlyBirdPrice,
-  //     //   formData.ticketTypes[0].description,
-  //     // );
-  //     const result = await addTicketTypes(formData.ticketTypes);
-  //     if (result) {
-  //       navigate("/account/dashboard");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error adding ticket type:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const handlePublish = async (e) => {
   e.preventDefault();
   setLoading(true);
@@ -123,7 +101,7 @@ const CreateTickets = () => {
       backendData[`earlyBirdDeadline${ticketNum}`] = "";
       backendData[`description${ticketNum}`] = "";
     }
-    backendData.totalTickets = allTickets;
+    backendData.totalTicket = allTickets;
 
     backendData.event = id;
     // Add creator ID

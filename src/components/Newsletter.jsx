@@ -16,9 +16,9 @@ const Newsletter = () => {
           <div className="flex flex-col lg:flex-row gap-4 max-w-md mx-auto">
             <input 
               placeholder="Enter your email"
-              className="flex-1 bg-white/90 border-0 h-12 text-gray-800 placeholder:text-gray-500 rounded-lg px-4 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors duration-300"
+              className="flex-1 bg-white/80 border-0 text-gray-800 placeholder:text-gray-800 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors duration-300"
             />
-            <button className="bg-white text-purple-600 hover:bg-gray-100 h-12 px-8 font-semibold rounded-lg transition-colors duration-300 cursor-pointer">
+            <button className="bg-white text-purple-600 hover:bg-gray-200 h-12 px-8 font-semibold rounded-lg transition-colors duration-300 cursor-pointer">
               Subscribe
             </button>
           </div>
