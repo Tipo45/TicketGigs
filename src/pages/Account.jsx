@@ -10,6 +10,7 @@ import { deleteAccount, logout } from "../backend/pocketbase";
 import {
   Calendar,
   Edit3,
+  Eye,
   LoaderCircle,
   MapPin,
   Plus,
@@ -38,6 +39,18 @@ import {
   TabsTrigger,
 } from "../components/ui/tabs";
 import { Cell, Pie, PieChart } from "recharts";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../components/ui/alert-dialog";
+import { useDeleteEvent } from "../hooks/useDeleteEvent";
 
 const Account = () => {
   const [activeTab, setActiveTab] = useState("events");
@@ -84,21 +97,6 @@ const Account = () => {
   //   });
   // }, []);
 
-  // Mock data for demonstration
-
-  // const userInfo = {
-  //
-  //   totalEvents: userEvents.length,
-  //   totalTicketsSold: userEvents.reduce(
-  //     (sum, event) => sum + event.ticketsSold,
-  //     0
-  //   ),
-  //   totalRevenue: userEvents.reduce(
-  //     (sum, event) => sum + event.ticketsSold * event.price,
-  //     0
-  //   ),
-  // };
-
   const chartConfig = {
     sold: {
       label: "Tickets Sold",
@@ -109,6 +107,8 @@ const Account = () => {
       color: "#e9d5ff",
     },
   };
+
+  const { mutate: removeEvent } = useDeleteEvent();
 
   return (
     <div className="min-h-screen bg-linear-to-br from-purple-50 to-blue-50">
@@ -183,7 +183,7 @@ const Account = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-purple-800">
-                ₦ 405,000,000
+                ₦ NaN
                 {/*   {userInfo.totalRevenue.toFixed(2)} {ticketData?.t || "-"} */}
               </div>
             </CardContent>
@@ -228,7 +228,6 @@ const Account = () => {
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
               <LoaderCircle className="animate-spin text-4xl text-purple-600" />
-              {/* <FaSpinner className="animate-spin text-4xl text-purple-600" /> */}
             </div>
           ) : (
             <TabsContent value="events" className="space-y-6">
@@ -270,7 +269,16 @@ const Account = () => {
                         <div key={event.id}>
                           <div
                             className="p-0 h-auto text-left"
-                            onClick={() => navigate(`/event/${event.id}`)}
+                            onClick={() => {
+                              navigate(
+                                `/account/${eventData?.id}/event-details`,
+                                {
+                                  state: {
+                                    eventInfo: eventData,
+                                  },
+                                }
+                              );
+                            }}
                           >
                             <Card
                               className={`overflow-hidden bg-white border border-purple-100 shadow-sm w-full ${
@@ -285,7 +293,7 @@ const Account = () => {
                                   <div className="shrink-0">
                                     <img
                                       src={`http://127.0.0.1:8090/api/files/events/${event.id}/${event.image}`}
-                                      alt="Event"
+                                      alt={event.eventTitle}
                                       className="w-full lg:w-48 h-48 object-cover rounded-lg"
                                     />
                                   </div>
@@ -322,25 +330,67 @@ const Account = () => {
                                           variant="outline"
                                           size="sm"
                                           className="border-purple-300 text-purple-700 hover:bg-purple-50 cursor-pointer"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigate(`/edit-event/${event.id}`);
-                                          }}
                                         >
-                                          <Edit3 className="h-4 w-4 mr-2" />
-                                          Edit
+                                          <Eye className="h-4 w-4 mr" />
+                                          View
                                         </Button>
 
-                                        <Button
-                                          variant="destructive"
-                                          size="sm"
-                                          className="cursor-pointer"
-                                          onClick={(e) => {e.stopPropagation();}}
-                                        >
+                                        <AlertDialog>
+                                          <AlertDialogTrigger asChild>
+                                            <Button
+                                              variant="destructive"
+                                              size="sm"
+                                              className="cursor-pointer"
+                                              onClick={(e) =>
+                                                e.stopPropagation()
+                                              }
+                                            >
+                                              <Trash2 className="h-4 w-4 mr-2" />
+                                              Delete
+                                            </Button>
+                                          </AlertDialogTrigger>
 
-                                          <Trash2 className="h-4 w-4 mr-2" />
-                                          Delete
-                                        </Button>
+                                          <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                              <AlertDialogTitle>
+                                                Delete Event?
+                                              </AlertDialogTitle>
+                                              <AlertDialogDescription>
+                                                This action cannot be undone.
+                                                This will permanently delete the
+                                                event and remove all associated
+                                                data.
+                                              </AlertDialogDescription>
+                                            </AlertDialogHeader>
+
+                                            <AlertDialogFooter>
+                                              <AlertDialogCancel asChild>
+                                                <button
+                                                  type="button"
+                                                  className="cursor-pointer"
+                                                  onClick={(e) =>
+                                                    e.stopPropagation()
+                                                  }
+                                                >
+                                                  Cancel
+                                                </button>
+                                              </AlertDialogCancel>
+
+                                              <AlertDialogAction asChild>
+                                                <button
+                                                  type="button"
+                                                  className="bg-red-600 hover:bg-red-700 text-white rounded-md px-4 py-2"
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    removeEvent(event.id);
+                                                  }}
+                                                >
+                                                  Yes, Delete
+                                                </button>
+                                              </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                          </AlertDialogContent>
+                                        </AlertDialog>
                                       </div>
                                     </div>
 
@@ -366,7 +416,7 @@ const Account = () => {
                                             className="flex items-center text-gray-600"
                                           >
                                             <Users className="h-4 w-4 mr-2 text-purple-500" />
-                                            {ticket.ticketSold}/
+                                            {ticket.ticketSold} /{" "}
                                             {ticket.totalTicket || 0} sold
                                           </div>
                                         ))
@@ -546,12 +596,13 @@ const Account = () => {
                         (+234) {data?.phone || "loading..."}
                       </p>
                     </div>
+
                     <div>
                       <label className="text-sm font-medium text-gray-700">
                         Organization
                       </label>
                       <p className="text-gray-600">
-                        {data?.organization || "loading..."}
+                        {eventData?.organizationName || "loading..."}
                       </p>
                     </div>
                   </div>
@@ -560,7 +611,11 @@ const Account = () => {
                       variant="outline"
                       className="border-purple-300 text-purple-700 hover:bg-purple-50"
                       onClick={() => {
-                        navigate("/account/edit");
+                        navigate(`/account/${data?.id}/edit`, {
+                          state: {
+                            userData: data,
+                          },
+                        });
                       }}
                     >
                       <Edit3 className="h-4 w-4 mr-2" />
@@ -568,7 +623,10 @@ const Account = () => {
                     </Button>
                     <Button
                       variant="outline"
-                      className="border-purple-300 text-purple-700 hover:bg-purple-50"
+                      className="border-purple-300 text-purple-700 hover:bg-purple-50 opacity-25 cursor-not-allowed"
+                      onClick={() => {
+                        // navigate(`/account/change-password/${data?.id}`);
+                      }}
                     >
                       Change Password
                     </Button>

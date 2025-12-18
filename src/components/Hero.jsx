@@ -119,7 +119,7 @@ const Header = () => {
           </p>
 
           {/* Search Bar */}
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 max-w-3xl mx-auto mb-8 border border-white/20">
+          {/* <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 max-w-3xl mx-auto mb-8 border border-white/20">
             <div className="space-y-4">
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -145,14 +145,14 @@ const Header = () => {
                     type="date"
                     className="w-full pl-12 pr-4 py-3 rounded-lg bg-white/90 text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
-                </div> */}
+                </div> 
               </div>
             </div>
 
             <button className="w-full cursor-pointer mt-4 py-3 text-lg font-semibold bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg transition-all duration-300">
               Find Events
             </button>
-          </div>
+          </div> */}
 
           {/* CTA Buttons */}
           <div className="flex flex-col gap-4 justify-center">

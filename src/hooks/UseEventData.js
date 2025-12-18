@@ -1,8 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { event_info, getSingleEvent } from "../backend/pocketbase";
+import { event_info, events_list, getSingleEvent } from "../backend/pocketbase";
 
 export function useListEvent() {
-    
+    return useQuery({
+        queryFn: () => events_list(),
+        queryKey: ["eventlist"],
+        networkMode: "always"
+    });
 }
 
 export function useEvent() {

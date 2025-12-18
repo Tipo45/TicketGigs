@@ -21,7 +21,7 @@ const SignInForm = () => {
       const result = await loginHost(email, password);
 
       if (result.record) {
-        navigate("/account/dashboard");
+        navigate(`/account/${result.record.id}/dashboard`);
       }
     } catch (error) {
       let errorMessage = "Login failed. Please try again.";

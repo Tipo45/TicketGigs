@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-// import { isUserLoggedIn } from "../BE/pocketbase";
 import FeaturedEvents from "../components/FeaturedEvents";
 import Features from "../components/Features";
 import HowItWorks from "../components/HowItWorks";
@@ -8,17 +7,23 @@ import Footer from "../components/Footer";
 import { CircleUser } from "lucide-react";
 import Header from "../components/Hero";
 import { isUserLoggedIn } from "../backend/pocketbase";
+import { useHostData } from "../hooks/useHostData";
 
 
 
 const Landingpage = () => {
 
   const isLoggedIn = isUserLoggedIn();
+  const { data: userData } = useHostData({
+    enabled: isLoggedIn,
+  });
+
 
   const navigate = useNavigate();
 
-   const handleAccountClick = () => {
-    navigate("/account/dashboard");
+    const handleAccountClick = () => {
+    if (!userData?.id) return;
+    navigate(`/account/${userData.id}/dashboard`);
   };
 
   return (
@@ -29,7 +34,7 @@ const Landingpage = () => {
       <HowItWorks />
       <Newsletter />
       <Footer />
-      {isLoggedIn && (
+      {isLoggedIn && userData?.id && (
         <div 
           className="fixed bottom-8 right-8 z-50 cursor-pointer"
           onClick={handleAccountClick}
