@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { updateEvent } from "../backend/pocketbase";
 import { Button } from "./ui/button";
 import { ArrowLeft, Calendar, FileText, MapPin, Save, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 const EditEvent = () => {
+
+  const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const eventData = location.state?.eventInfo;
@@ -24,6 +26,7 @@ const EditEvent = () => {
     "Health & Wellness",
     "Other",
   ];
+
   const [formData, setFormData] = useState({
     title: eventData?.eventTitle || "",
     description: eventData?.eventDescription || "",
@@ -138,7 +141,6 @@ const EditEvent = () => {
               <div>
                 <label htmlFor="title">Event Title </label>
                 <input
-                  id="title"
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}

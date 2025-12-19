@@ -226,8 +226,9 @@ const Account = () => {
 
           {/* Events Tab */}
           {isLoading ? (
-            <div className="flex items-center justify-center h-64">
-              <LoaderCircle className="animate-spin text-4xl text-purple-600" />
+            <div className="flex flex-col items-center justify-center h-64">
+              <LoaderCircle className="animate-spin text-4xl mb-4 text-purple-600" />
+              <p>Loading...</p>
             </div>
           ) : (
             <TabsContent value="events" className="space-y-6">
@@ -292,7 +293,8 @@ const Account = () => {
                                   {/* Event Image */}
                                   <div className="shrink-0">
                                     <img
-                                      src={`http://127.0.0.1:8090/api/files/events/${event.id}/${event.image}`}
+                                      // src={`http://127.0.0.1:8090/api/files/events/${event.id}/${event.image}`}
+                                      src={`https://service-konnect.pockethost.io/api/files/events/${event.id}/${event.image}`}
                                       alt={event.eventTitle}
                                       className="w-full lg:w-48 h-48 object-cover rounded-lg"
                                     />

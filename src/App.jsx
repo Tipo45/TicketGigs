@@ -34,12 +34,12 @@ function App() {
         <Route path="/signup" element={<SignUpForm />} />
         <Route path="/account/:id/dashboard" element={<Account />} />
         <Route path="/account/:id/edit" element={<EditUser />} />
+        <Route path="/account/:id/event-details/:id" element={<DetailedEvent />} />
 
         {/* <Route path="/account/:id/change-password" element={<ChangePassword />} /> */}
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/account/:id/event-details" element={<EditEvent />} />
-        <Route path="/account/:id/event-details/:id" element={<DetailedEvent />} />
-
+        
         <Route path="*" element={<Nopage />} />
       </Routes>
       </BrowserRouter>

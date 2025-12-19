@@ -109,7 +109,7 @@ const CreateTickets = () => {
 
     const result = await addTicketType(backendData);
     if (result) {
-      navigate("/account/dashboard");
+      navigate(`/account/${id}/dashboard`);
     }
   } catch (error) {
     console.error("Error adding ticket types:", error);

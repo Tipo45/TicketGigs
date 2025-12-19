@@ -142,7 +142,8 @@ const Events = () => {
                   >
                     <div className="h-48 bg-linear-to-br from-purple-100 to-blue-100 flex items-center justify-center">
                       <img
-                        src={`http://127.0.0.1:8090/api/files/events/${event.id}/${event.image}`}
+                        // src={`http://127.0.0.1:8090/api/files/events/${event.id}/${event.image}`}
+                        src={`https://service-konnect.pockethost.io/api/files/events/${event.id}/${event.image}`}
                         alt={event.title}
                         className="w-full h-full object-cover"
                       />

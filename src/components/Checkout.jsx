@@ -1,4 +1,4 @@
-import { CalendarDays, CreditCard, MapPin, Minus, Plus, ShieldCheck, Trash2 } from "lucide-react";
+import { CalendarDays, CreditCard, MapPin, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -9,14 +9,28 @@ const Checkout = () => {
   const { event, ticket, quantity } = location.state || {};
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
+  const [buyerInfo, setBuyerInfo] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+  });
+
   const navigate = useNavigate();
+
+  const handleBuyerChange = (e) => {
+    const { name, value } = e.target;
+    setBuyerInfo((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   useEffect(() => {
     if (!event || !ticket || !quantity) {
       navigate("/events"); // or homepage
     }
   }, [event, ticket, quantity, navigate]);
-
 
   const applyPromoCode = () => {
     if (promoCode.toLowerCase() === "save10") {
@@ -26,10 +40,10 @@ const Checkout = () => {
     }
   };
 
-  const subtotal = ticket.price * quantity; 
+  const subtotal = ticket.price * quantity;
 
   const discountAmount = subtotal * discount;
-  const serviceFee = subtotal * 0.05; // 5% service fee
+  const serviceFee = subtotal * 0.15; // 15% service fee
   const total = subtotal - discountAmount + serviceFee;
 
   const handleViewEventsClick = () => {
@@ -51,6 +65,75 @@ const Checkout = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
           {/* checkOut Items */}
           <div className="lg:col-span-2 space-y-4">
+            {/* Buyer Information */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Buyer Information
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={buyerInfo.firstName}
+                    onChange={handleBuyerChange}
+                    placeholder="John"
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={buyerInfo.lastName}
+                    onChange={handleBuyerChange}
+                    placeholder="Doe"
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={buyerInfo.email}
+                    onChange={handleBuyerChange}
+                    placeholder="john@example.com"
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={buyerInfo.phone}
+                    onChange={handleBuyerChange}
+                    placeholder="+234 801 234 5678"
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+              </div>
+            </div>
+
             {ticket.length === 0 ? (
               <div className="bg-white rounded-xl shadow-md overflow-hidden">
                 <div className="text-center py-12">
@@ -67,16 +150,14 @@ const Checkout = () => {
                 </div>
               </div>
             ) : (
-              <div
-
-                className="bg-white rounded-xl shadow-md overflow-hidden"
-              >
+              <div className="bg-white rounded-xl shadow-md overflow-hidden">
                 <div className="p-6">
                   <div className="flex flex-col gap-4">
                     {/* Event Image Placeholder */}
                     <div className="w-full h-full bg-linear-to-br from-purple-100 to-blue-100 rounded-lg flex items-center justify-center">
                       <img
-                        src={`http://127.0.0.1:8090/api/files/events/${event.id}/${event.image}`}
+                        // src={`http://127.0.0.1:8090/api/files/events/${event.id}/${event.image}`}
+                        src={`https://service-konnect.pockethost.io/api/files/events/${event.id}/${event.image}`}
                         alt={event.eventTitle}
                         className="w-full h-full object-cover"
                       />
@@ -207,7 +288,14 @@ const Checkout = () => {
               </div>
 
               {/* Checkout Button */}
-              <button className="w-full cursor-pointer bg-linear-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 py-3 text-lg font-semibold rounded-lg transition-all duration-300">
+              <button  className={
+                !buyerInfo.firstName ||
+                !buyerInfo.lastName ||
+                !buyerInfo.email ||
+                !buyerInfo.phone
+                  ? "cursor-not-allowed bg-gray-300 text-gray-500 w-full py-3 text-lg font-semibold rounded-lg "
+                  : "w-full cursor-pointer bg-linear-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 py-3 text-lg font-semibold rounded-lg transition-all duration-300"
+              }>
                 <CreditCard className="mr-2 h-6 w-6 mb-1 inline" />
                 Proceed to Pay
               </button>

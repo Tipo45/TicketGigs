@@ -87,8 +87,7 @@ export async function createEvent(data) {
 
 // add ticket type
 export async function addTicketType(ticketData) {
-  // const record = await pb.collection("tickets").create(ticketData);
-  const record = await pb.collection("ticket").create(ticketData);
+  const record = await pb.collection("tickets").create(ticketData);
   return record;
 }
 
@@ -116,28 +115,21 @@ export async function getSingleEvent(id) {
 
 // view tickets info
 export async function ticket_info() {
-  // const record = await pb.collection("tickets").getFullList();
-  const record = await pb.collection("ticket").getFullList();
+  const record = await pb.collection("tickets").getFullList();
   return record;
 }
 
 // view ticket info by id
 export async function getSingleTicket(id) {
-  // const record = await pb.collection("tickets").getOne(id);
- const record = await pb.collection("ticket").getOne(id);
+  const record = await pb.collection("tickets").getOne(id);
   return record;
 }
 
 // update ticket
 export async function updateTicketSales(ticketId, amountToAdd) {
-  // const ticket = await pb.collection("tickets").getOne(ticketId);
-  const ticket = await pb.collection("ticket").getOne(ticketId);
+  const ticket = await pb.collection("tickets").getOne(ticketId);
 
-  // const record = await pb.collection("tickets").update(ticketId, {
-  //   ticketSold: (ticket.ticketSold || 0) + amountToAdd,
-  // });
-
-  const record = await pb.collection("ticket").update(ticketId, {
+  const record = await pb.collection("tickets").update(ticketId, {
     ticketSold: (ticket.ticketSold || 0) + amountToAdd,
   });
 

@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   CalendarDays,
+  ChevronsRight,
   Clock,
   LoaderCircle,
   MapPin,
@@ -113,7 +114,8 @@ const EventDetails = () => {
         {/* IMAGE HEADER */}
         <div className="relative h-96 overflow-hidden rounded-xl shadow-md">
           <img
-            src={`http://127.0.0.1:8090/api/files/events/${event.id}/${event.image}`}
+            // src={`http://127.0.0.1:8090/api/files/events/${event.id}/${event.image}`}
+            src={`https://service-konnect.pockethost.io/api/files/events/${event.id}/${event.image}`}
             alt={event.eventTitle}
             className="w-full h-full object-cover"
           />
@@ -291,9 +293,10 @@ const EventDetails = () => {
 
               <button
                 onClick={handleAddToCheckout}
-                className="w-full mt-4 py-3 bg-linear-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 rounded-lg font-medium transition-colors duration-200"
+                className="flex items-center justify-center w-full mt-4 py-2 bg-linear-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 rounded-lg font-medium transition-colors duration-200 group"
               >
                 Proceed to Checkout
+                <ChevronsRight className="mt-0.5 ml-1 group-hover:translate-x-0.5" />
               </button>
               <div className="mt-2 text-xs text-gray-500">Upon successful payment, your tickets are automatically sent to the email address provided during checkout.</div>
             </div>

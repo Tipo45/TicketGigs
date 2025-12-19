@@ -72,7 +72,8 @@ const FeaturedEvents = () => {
                   >
                     <div className="relative">
                       <img
-                        src={`http://127.0.0.1:8090/api/files/events/${event.id}/${event.image}`}
+                        // src={`http://127.0.0.1:8090/api/files/events/${event.id}/${event.image}`}
+                        src={`https://service-konnect.pockethost.io/api/files/events/${event.id}/${event.image}`}
                         alt={event.title}
                         className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                       />
