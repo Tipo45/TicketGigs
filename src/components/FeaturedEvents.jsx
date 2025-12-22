@@ -85,7 +85,7 @@ const FeaturedEvents = () => {
 
                       {eventTickets.map((ticket) => (<div key={ticket.id} className="absolute top-4 right-4">
                         <span className="bg-white/90 text-purple-700 px-3 py-1 rounded-full text-sm font-bold">
-                          ₦ {formatPrice(ticket.ticketPrice1)}
+                          {ticket?.ticketPrice1 === 0 ? 'Free' : `₦ ${formatPrice(ticket.ticketPrice1)}`}
                         </span>
                       </div>))}
 

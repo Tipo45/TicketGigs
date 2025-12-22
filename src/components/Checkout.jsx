@@ -191,10 +191,10 @@ const Checkout = () => {
                     <div className="flex flex-col items-end justify-between">
                       <div className="text-right">
                         <div className="text-2xl font-bold text-gray-900">
-                          ₦ {(quantity * ticket.price).toLocaleString("en-US")}
+                          {ticket.price === 0 ? 'Free' : `₦ ${(quantity * ticket.price).toLocaleString()}`}
                         </div>
                         <div className="text-xs text-gray-500">
-                          ₦ {ticket.price.toLocaleString()} per ticket
+                          {ticket.price === 0 ? 'Free' : `₦ ${ticket.price.toLocaleString()} per ticket`} 
                         </div>
                       </div>
 

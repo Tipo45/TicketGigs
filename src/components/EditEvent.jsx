@@ -28,6 +28,7 @@ const EditEvent = () => {
   ];
 
   const [formData, setFormData] = useState({
+    id: eventData?.id || "",
     title: eventData?.eventTitle || "",
     description: eventData?.eventDescription || "",
     category: eventData?.category || "",
@@ -57,7 +58,7 @@ const EditEvent = () => {
 
   console.log("Event Data in EditEvent:", eventData);
   console.log("Event Data in EditEvent:", eventData.contactEmail);
-  console.log("Form Data in EditEvent:", formData);
+  console.log("Form Data in EditEvent id:", formData.id);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

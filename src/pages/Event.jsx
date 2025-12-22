@@ -43,9 +43,13 @@ const Events = () => {
     { value: "music", label: "Music" },
     { value: "conference", label: "Conference" },
     { value: "food", label: "Food & Drink" },
-    { value: "art", label: "Art & Culture" },
+    { value: "art & culture", label: "Art & Culture" },
     { value: "sports", label: "Sports" },
     { value: "entertainment", label: "Entertainment" },
+    { value: "education", label: "Education" },
+    { value: "business", label: "Business" },
+    { value: "technology", label: "Technology" },
+    { value: "health", label: "Health & Wellness" },
     { value: "others", label: "Others" },
   ];
 

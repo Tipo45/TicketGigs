@@ -557,9 +557,9 @@ const CreateEvent = () => {
             ) : (
               <button
                 type="submit"
-                className="flex items-center justify-center px-8 py-3 cursor-pointer bg-linear-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 rounded-lg font-medium transition-colors duration-200"
+                className="flex items-center justify-center px-8 py-3 cursor-pointer bg-linear-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 rounded-lg font-medium transition-colors duration-200 group hover:text-lg"
               >
-                Next <ArrowRight className="ml-2" />
+                Next <ArrowRight className="ml-2 group-hover:translate-x-1" />
               </button>
             )}
           </div>

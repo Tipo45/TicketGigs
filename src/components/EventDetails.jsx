@@ -11,7 +11,7 @@ import {
   TicketCheck,
   User,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTicket } from "../hooks/useTicketData";
 import { useSingleEvent } from "../hooks/UseEventData";
@@ -27,50 +27,52 @@ const EventDetails = () => {
   const { data: eventData, isLoading } = useSingleEvent(id);
   const { data: tickets } = useTicket();
 
-  if (!eventData) return null;
-
-  // No mock event!!
-  const event = eventData;
-
   // FILTER TICKETS FOR THIS EVENT
   const eventTickets =
     tickets?.filter((ticket) => ticket.event === eventData?.id) || [];
 
   // ticket options
   const ticketOptions = eventTickets.flatMap(ticket => [
-  {
-    name: ticket.ticketName1,
-    price: ticket.ticketPrice1,
-    description: ticket.description1,
-  },
-  {
-    name: ticket.ticketName2,
-    price: ticket.ticketPrice2,
-    description: ticket.description2,
-  },
-  {
-    name: ticket.ticketName3,
-    price: ticket.ticketPrice3,
-    description: ticket.description3,
-  },
-  {
-    name: ticket.ticketName4,
-    price: ticket.ticketPrice4,
-    description: ticket.description4,
-  },
-  {
-    name: ticket.ticketName5,
-    price: ticket.ticketPrice5,
-    description: ticket.description5,
-  },
-  {
-    name: ticket.ticketName6,
-    price: ticket.ticketPrice6,
-    description: ticket.description6,
-  }
-]).filter(t => t.name);
+    {
+      name: ticket.ticketName1,
+      price: ticket.ticketPrice1,
+      description: ticket.description1,
+    },
+    {
+      name: ticket.ticketName2,
+      price: ticket.ticketPrice2,
+      description: ticket.description2,
+    },
+    {
+      name: ticket.ticketName3,
+      price: ticket.ticketPrice3,
+      description: ticket.description3,
+    },
+    {
+      name: ticket.ticketName4,
+      price: ticket.ticketPrice4,
+      description: ticket.description4,
+    },
+    {
+      name: ticket.ticketName5,
+      price: ticket.ticketPrice5,
+      description: ticket.description5,
+    },
+    {
+      name: ticket.ticketName6,
+      price: ticket.ticketPrice6,
+      description: ticket.description6,
+    }
+  ]).filter(t => t.name);
 
+  const selectedTicket = ticketOptions[selectedTicketType];
+  const isFreeTicket = selectedTicket?.price === 0;
 
+  useEffect(() => {
+    if (isFreeTicket) {
+      setQuantity(1);
+    }
+  }, [isFreeTicket]);
 
   const handleQuantityChange = (change) => {
     const newQuantity = quantity + change;
@@ -86,6 +88,8 @@ const EventDetails = () => {
       }
     })
   };
+ // No mock event!!
+  const event = eventData;
 
   if (isLoading || !event) {
     return (
@@ -228,7 +232,7 @@ const EventDetails = () => {
           {/* SIDEBAR */}
           <div className="space-y-6">
             {/* TICKET BOOKING */}
-            <div className="bg-white rounded-xl shadow-md p-6">
+            {ticketOptions.length > 0 && (<div className="bg-white rounded-xl shadow-md p-6">
               <div className="mb-6">
                 <div className="flex items-center gap-2 text-lg font-semibold text-purple-700">
                   <TicketCheck className="h-5 w-5" />
@@ -240,11 +244,10 @@ const EventDetails = () => {
               {ticketOptions.map((ticket, index) => (
                 <div
                   key={index}
-                  className={`p-4 border rounded-lg cursor-pointer mb-3 ${
-                    selectedTicketType === index
-                      ? "border-purple-500 bg-purple-50"
-                      : "border-gray-200 hover:border-purple-300"
-                  }`}
+                  className={`p-4 border rounded-lg cursor-pointer mb-3 ${selectedTicketType === index
+                    ? "border-purple-500 bg-purple-50"
+                    : "border-gray-200 hover:border-purple-300"
+                    }`}
                   onClick={() => setSelectedTicketType(index)}
                 >
                   <div className="flex justify-between items-start">
@@ -252,7 +255,7 @@ const EventDetails = () => {
                       {ticket.name}
                     </h4>
                     <span className="text-md font-bold text-purple-600">
-                      ₦ {ticket.price.toLocaleString()}
+                      {ticket.price === 0 ? 'Free' : `₦ ${ticket.price.toLocaleString()}`}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600">
@@ -264,7 +267,9 @@ const EventDetails = () => {
               {/* Quantity */}
               <div className="flex items-center justify-between mt-4">
                 <span className="font-medium text-gray-700">Quantity</span>
+
                 <div className="flex items-center gap-2">
+                  {/* Minus */}
                   <button
                     onClick={() => handleQuantityChange(-1)}
                     disabled={quantity <= 1}
@@ -272,16 +277,22 @@ const EventDetails = () => {
                   >
                     <Minus className="h-3 w-3" />
                   </button>
+
                   <span>{quantity}</span>
-                  <button
-                    onClick={() => handleQuantityChange(1)}
-                    disabled={quantity >= 10}
-                    className="h-8 w-8 flex items-center justify-center rounded-full border"
-                  >
-                    <Plus className="h-3 w-3" />
-                  </button>
+
+                  {/* Plus — ONLY if NOT free */}
+                  {!isFreeTicket && (
+                    <button
+                      onClick={() => handleQuantityChange(1)}
+                      disabled={quantity >= 10}
+                      className="h-8 w-8 flex items-center justify-center rounded-full border"
+                    >
+                      <Plus className="h-3 w-3" />
+                    </button>
+                  )}
                 </div>
               </div>
+
 
               {/* Total */}
               <div className="flex justify-between items-center font-bold mt-4">
@@ -293,13 +304,13 @@ const EventDetails = () => {
 
               <button
                 onClick={handleAddToCheckout}
-                className="flex items-center justify-center w-full mt-4 py-2 bg-linear-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 rounded-lg font-medium transition-colors duration-200 group"
+                className="flex items-center justify-center w-full mt-4 py-2 bg-linear-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 rounded-lg font-medium transition-colors duration-200 group hover:text-lg"
               >
                 Proceed to Checkout
                 <ChevronsRight className="mt-0.5 ml-1 group-hover:translate-x-0.5" />
               </button>
               <div className="mt-2 text-xs text-gray-500">Upon successful payment, your tickets are automatically sent to the email address provided during checkout.</div>
-            </div>
+            </div>)}
 
             {/* Organizer Info */}
             {event.organizerName ? (<div className="bg-white rounded-xl shadow-md p-6">
@@ -323,7 +334,7 @@ const EventDetails = () => {
               </button>
             </div>) : (<div className="bg-white rounded-xl shadow-md p-6"><p className="text-gray-600 text-sm">No organizer info available.</p></div>)}
 
-            
+
           </div>
         </div>
       </div>

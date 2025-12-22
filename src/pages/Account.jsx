@@ -282,11 +282,10 @@ const Account = () => {
                             }}
                           >
                             <Card
-                              className={`overflow-hidden bg-white border border-purple-100 shadow-sm w-full ${
-                                getEventStatus(event.eventDate) === "non-active"
+                              className={`overflow-hidden bg-white border border-purple-100 shadow-sm w-full ${getEventStatus(event.eventDate) === "non-active"
                                   ? "opacity-60"
                                   : "opacity-100"
-                              }`}
+                                }`}
                             >
                               <CardContent className="p-6">
                                 <div className="flex flex-col lg:flex-row gap-6">
@@ -310,18 +309,17 @@ const Account = () => {
 
                                         <Badge
                                           className={`mt-2 px-2 py-1 text-sm font-medium rounded-full
-                                    ${
-                                      getEventStatus(event.eventDate) ===
-                                      "active"
-                                        ? "bg-green-100 text-green-700"
-                                        : getEventStatus(event.eventDate) ===
-                                          "non-active"
-                                        ? "bg-red-100 text-red-700"
-                                        : "bg-gray-200 text-gray-700"
-                                    }`}
+                                    ${getEventStatus(event.eventDate) ===
+                                              "active"
+                                              ? "bg-green-100 text-green-700"
+                                              : getEventStatus(event.eventDate) ===
+                                                "non-active"
+                                                ? "bg-red-100 text-red-700"
+                                                : "bg-gray-200 text-gray-700"
+                                            }`}
                                         >
                                           {getEventStatus(event.eventDate) ===
-                                          "active"
+                                            "active"
                                             ? "Active"
                                             : "Non Active"}
                                         </Badge>
@@ -521,8 +519,8 @@ const Account = () => {
                                               );
                                             return totalQty > 0
                                               ? Math.round(
-                                                  (totalSold / totalQty) * 100
-                                                )
+                                                (totalSold / totalQty) * 100
+                                              )
                                               : 0;
                                           })()}
                                           %

@@ -2,11 +2,13 @@ import { Menu, Search, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { isUserLoggedIn } from "../backend/pocketbase";
+import { useHostData } from "../hooks/useHostData";
 
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const { data: userData } = useHostData();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -20,9 +22,9 @@ const Header = () => {
     const isAuthenticated = isUserLoggedIn();
 
     if (isAuthenticated) {
-      navigate("/account/dashboard");
+      navigate(`/account/${userData.id}/dashboard`);
     } else {
-      navigate("/signin", { state: { from: "/create-event", message: "pleease sign in" } });
+      navigate("/signin", { state: { from: "/create-event", message: "please sign in" } });
     }
   };
 
