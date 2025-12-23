@@ -74,8 +74,19 @@ const Account = () => {
   }
 
   const totalTicketsSold =
-    tickets?.reduce((sum, t) => sum + (t.ticketSold || 0), 0) || 0;
+  filteredData.reduce((eventSum, event) => {
+    const eventTickets =
+      tickets?.filter((ticket) => ticket.event === event.id) || [];
 
+    const eventSold = eventTickets.reduce(
+      (sum, t) => sum + (t.ticketSold || 0),
+      0
+    );
+
+    return eventSum + eventSold;
+  }, 0);
+
+ 
   useEffect(() => {
     if (!eventData) return;
 
@@ -171,7 +182,7 @@ const Account = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-purple-800">
-                {totalTicketsSold}
+                {totalTicketsSold || 0}
               </div>
             </CardContent>
           </Card>
@@ -272,10 +283,10 @@ const Account = () => {
                             className="p-0 h-auto text-left"
                             onClick={() => {
                               navigate(
-                                `/account/${eventData?.id}/event-details`,
+                                `/account/${event?.id}/event-details`,
                                 {
                                   state: {
-                                    eventInfo: eventData,
+                                    eventInfo: event,
                                   },
                                 }
                               );
@@ -283,8 +294,8 @@ const Account = () => {
                           >
                             <Card
                               className={`overflow-hidden bg-white border border-purple-100 shadow-sm w-full ${getEventStatus(event.eventDate) === "non-active"
-                                  ? "opacity-60"
-                                  : "opacity-100"
+                                ? "opacity-60"
+                                : "opacity-100"
                                 }`}
                             >
                               <CardContent className="p-6">

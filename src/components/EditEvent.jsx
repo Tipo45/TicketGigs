@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { updateEvent } from "../backend/pocketbase";
 import { Button } from "./ui/button";
@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 const EditEvent = () => {
 
-  const { id } = useParams();
+  // const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const eventData = location.state?.eventInfo;
@@ -28,20 +28,41 @@ const EditEvent = () => {
   ];
 
   const [formData, setFormData] = useState({
-    id: eventData?.id || "",
-    title: eventData?.eventTitle || "",
-    description: eventData?.eventDescription || "",
-    category: eventData?.category || "",
-    tags: eventData?.tags || "",
-    date: eventData?.eventDate || "",
-    time: eventData?.eventTime || "",
-    venue: eventData?.venueName || "",
-    location: eventData?.fullAddress || "",
-    organizer: eventData?.organizerName || "",
-    contactEmail: eventData?.contactEmail || "",
-    phone: eventData?.contactPhone || "",
-    image: eventData?.eventImage || "",
+    id: "",
+    title: "",
+    description: "",
+    category: "",
+    tags: "",
+    date: "",
+    time: "",
+    venue: "",
+    location: "",
+    organizer: "",
+    contactEmail: "",
+    phone: "",
+    image: "",
   });
+
+  useEffect(() => {
+    if (eventData) {
+      setFormData({
+        id: eventData.id,
+        title: eventData.eventTitle || "",
+        description: eventData.eventDescription || "",
+        category: eventData.category || "",
+        tags: eventData.tags || "",
+        date: eventData.eventDate || "",
+        time: eventData.eventTime || "",
+        venue: eventData.venueName || "",
+        location: eventData.fullAddress || "",
+        organizer: eventData.organizerName || "",
+        contactEmail: eventData.contactEmail || "",
+        phone: eventData.contactPhone || "",
+        image: eventData.eventImage || "",
+      });
+    }
+  }, [eventData]);
+
 
   const [errors, setErrors] = useState({
     title: "",
@@ -55,10 +76,6 @@ const EditEvent = () => {
     organizer: "",
     phone: "",
   });
-
-  console.log("Event Data in EditEvent:", eventData);
-  console.log("Event Data in EditEvent:", eventData.contactEmail);
-  console.log("Form Data in EditEvent id:", formData.id);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -90,17 +107,37 @@ const EditEvent = () => {
     }
 
     try {
-      const result = await updateEvent(eventData.id, formData);
+      const form = new FormData();
 
-      if (result) {
-        navigate(-1);
+      form.append("eventTitle", formData.title);
+      form.append("eventDescription", formData.description);
+      form.append("category", formData.category);
+      form.append("tags", formData.tags);
+      form.append("eventDate", formData.date);
+      form.append("eventTime", formData.time);
+      form.append("venue", formData.venue);
+      form.append("fullAddress", formData.location);
+      form.append("organizerName", formData.organizer);
+      form.append("contactEmail", formData.contactEmail);
+      form.append("contactPhone", formData.phone);
+
+      // ✅ ONLY append image if user selected one
+      if (formData.image instanceof File) {
+        form.append("image", formData.image);
       }
+
+      await updateEvent(eventData.id, form);
+      navigate(-1);
     } catch (error) {
       console.error("Error updating user:", error);
       alert("An error occurred while updating your information.");
     }
+
     setLoading(false);
   };
+
+
+
 
   if (!eventData) {
     return (
@@ -153,7 +190,6 @@ const EditEvent = () => {
               <div>
                 <label htmlFor="description">Event Description </label>
                 <textarea
-                  id="description"
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
@@ -167,7 +203,6 @@ const EditEvent = () => {
                 <div>
                   <label htmlFor="category">Category </label>
                   <select
-                    id="category"
                     name="category"
                     value={formData.category}
                     onChange={handleInputChange}
@@ -185,7 +220,6 @@ const EditEvent = () => {
                 <div>
                   <label htmlFor="tags">Tags (comma separated)</label>
                   <input
-                    id="tags"
                     name="tags"
                     value={formData.tags}
                     onChange={handleInputChange}
@@ -210,7 +244,6 @@ const EditEvent = () => {
                 <div>
                   <label htmlFor="date">Event Date</label>
                   <input
-                    id="date"
                     name="date"
                     type="date"
                     value={formData.date}
@@ -222,7 +255,6 @@ const EditEvent = () => {
                 <div>
                   <label htmlFor="time">Event Time</label>
                   <input
-                    id="time"
                     name="time"
                     type="time"
                     value={formData.time}
@@ -246,7 +278,6 @@ const EditEvent = () => {
               <div>
                 <label htmlFor="venue">Venue Name</label>
                 <input
-                  id="venue"
                   name="venue"
                   value={formData.venue}
                   onChange={handleInputChange}
@@ -258,7 +289,6 @@ const EditEvent = () => {
               <div>
                 <label htmlFor="location">Full Address *</label>
                 <input
-                  id="location"
                   name="location"
                   value={formData.location}
                   onChange={handleInputChange}
@@ -282,7 +312,6 @@ const EditEvent = () => {
                 <div>
                   <label htmlFor="capacity">Max Capacity</label>
                   <input
-                    id="capacity"
                     name="capacity"
                     type="number"
                     value={formData.capacity}
@@ -295,7 +324,6 @@ const EditEvent = () => {
                 <div>
                   <label htmlFor="price">Ticket Price (₦)</label>
                   <input
-                    id="price"
                     name="price"
                     type="number"
                     step="0.01"
@@ -309,7 +337,6 @@ const EditEvent = () => {
                 <div>
                   <label htmlFor="earlyBirdPrice">Early Bird Price (₦)</label>
                   <input
-                    id="earlyBirdPrice"
                     name="earlyBirdPrice"
                     type="number"
                     step="0.01"
@@ -325,7 +352,6 @@ const EditEvent = () => {
                 <div>
                   <label htmlFor="earlyBirdDeadline">Early Bird Deadline</label>
                   <input
-                    id="earlyBirdDeadline"
                     name="earlyBirdDeadline"
                     type="date"
                     value={formData.earlyBirdDeadline}
@@ -349,7 +375,6 @@ const EditEvent = () => {
               <div>
                 <label htmlFor="organizer">Organizer Name</label>
                 <input
-                  id="organizer"
                   name="organizer"
                   value={formData.organizer}
                   onChange={handleInputChange}
@@ -362,7 +387,6 @@ const EditEvent = () => {
                 <div>
                   <label htmlFor="contactEmail">Contact Email</label>
                   <input
-                    id="contactEmail"
                     name="contactEmail"
                     type="email"
                     value={formData.contactEmail}
@@ -373,9 +397,8 @@ const EditEvent = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="contactPhone">Contact Phone</label>
+                  <label htmlFor="phone">Contact Phone</label>
                   <input
-                    id="phone"
                     name="phone"
                     type="tel"
                     value={formData.phone}
